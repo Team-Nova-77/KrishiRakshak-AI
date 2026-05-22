@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KrishiRakshak AI</title>
+  <link rel="stylesheet" href="/src/style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-900 font-sans antialiased min-h-screen flex flex-col">
+  <!-- Navbar -->
+  <nav class="bg-green-700 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="leaf" class="w-8 h-8"></i>
+          <span class="font-bold text-xl tracking-tight" data-i18n="app_title">KrishiRakshak AI</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <select id="lang-switcher" class="bg-green-800 text-white border border-green-600 rounded px-2 py-1 text-sm focus:outline-none">
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+            <option value="mr">मराठी</option>
+          </select>
+          <div id="nav-auth-links" class="hidden space-x-4">
+            <button id="btn-nav-home" class="hover:text-green-200 transition-colors flex items-center space-x-1 focus:outline-none">
+              <i data-lucide="home" class="w-5 h-5"></i>
+              <span class="hidden sm:inline" data-i18n="nav_home">Home</span>
+            </button>
+            <button id="btn-nav-login" class="px-3 py-1 bg-white text-green-700 rounded-md font-medium hover:bg-green-50 transition-colors flex items-center space-x-1 focus:outline-none">
+              <i data-lucide="log-in" class="w-4 h-4"></i>
+              <span class="hidden sm:inline" data-i18n="nav_login">Login</span>
+            </button>
+          </div>
+          <div id="nav-user-links" class="hidden space-x-4">
+            <button id="btn-nav-profile" class="hover:text-green-200 transition-colors flex items-center space-x-1 focus:outline-none">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              <span class="hidden sm:inline" data-i18n="nav_profile">Profile</span>
+            </button>
+            <button id="btn-nav-dash" class="hover:text-green-200 transition-colors flex items-center space-x-1 focus:outline-none">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span class="hidden sm:inline" data-i18n="nav_dashboard">Dashboard</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex flex-col justify-center">
+    <!-- Landing Page View -->
+    <div id="view-landing" class="block">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <div class="inline-flex items-center justify-center p-3 bg-green-100 rounded-full mb-6">
+           <i data-lucide="sprout" class="w-12 h-12 text-green-600"></i>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight mb-4" data-i18n="hero_title">Smart Crop Health Monitoring Platform</h1>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10" data-i18n="hero_subtitle">Empowering farmers with AI-driven insights for better yields and healthier crops.</p>
+        <button id="btn-get-started" class="px-8 py-4 bg-green-600 text-white rounded-lg text-lg font-bold shadow-lg hover:bg-green-700 transition flex items-center mx-auto space-x-2">
+            <span data-i18n="get_started">Get Started</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <!-- Features Section -->
+      <div class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+           <div class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
+               <i data-lucide="scan-line" class="w-10 h-10 text-green-600 mb-4"></i>
+               <h3 class="text-xl font-bold mb-2">AI Image Analysis</h3>
+               <p class="text-gray-600">Upload plant images to instantly detect diseases and assess crop health using cutting-edge Vision AI.</p>
+           </div>
+           <div class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
+               <i data-lucide="droplets" class="w-10 h-10 text-blue-500 mb-4"></i>
+               <h3 class="text-xl font-bold mb-2">Smart Recommendations</h3>
+               <p class="text-gray-600">Get tailored fertilizer and irrigation advice to optimize yield and soil health safely.</p>
+           </div>
+           <div class="p-6 border rounded-xl shadow-sm hover:shadow-md transition">
+               <i data-lucide="languages" class="w-10 h-10 text-orange-500 mb-4"></i>
+               <h3 class="text-xl font-bold mb-2">Multilingual Support</h3>
+               <p class="text-gray-600">Accessible advisory available natively in English, Hindi, and Marathi to support every local farmer.</p>
+           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auth Page View -->
+    <div id="view-auth" class="hidden">
+      <div class="max-w-md mx-auto mt-16 bg-white rounded-xl shadow-md p-8 border border-gray-100">
+        <!-- Login Form -->
+        <div id="form-login-container">
+          <h2 class="text-2xl font-bold text-center text-green-700 mb-6" data-i18n="login_title">Farmer Login</h2>
+          <form id="form-login" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="phone_label">Phone Number</label>
+              <input type="text" id="login-phone" required data-i18n="phone_placeholder" placeholder="Enter mobile number" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="password_label">Password</label>
+              <input type="password" id="login-pwd" required data-i18n="password_placeholder" placeholder="Enter password" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+            </div>
+            <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 rounded-md hover:bg-green-700 transition" data-i18n="login_btn">Login</button>
+          </form>
+          <div class="mt-4 text-center">
+            <button id="btn-show-register" class="text-sm text-green-600 hover:text-green-800" data-i18n="register_prompt">New farmer? Register here</button>
+          </div>
+
+        </div>
+
+        <!-- Register Form -->
+        <div id="form-register-container" class="hidden">
+          <h2 class="text-2xl font-bold text-center text-green-700 mb-6" data-i18n="register_title">Farmer Registration</h2>
+          <form id="form-register" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="name_label">Full Name</label>
+              <input type="text" id="reg-name" required data-i18n="name_placeholder" placeholder="Enter full name" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="phone_label">Phone Number</label>
+              <input type="text" id="reg-phone" required data-i18n="phone_placeholder" placeholder="Enter mobile number" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="village_label">Village Name</label>
+              <input type="text" id="reg-village" required data-i18n="village_placeholder" placeholder="Enter village name" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="crop_label">Primary Crop</label>
+              <select id="reg-crop" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+                <option value="Tomato" data-i18n="crop_Tomato">Tomato</option>
+                <option value="Potato" data-i18n="crop_Potato">Potato</option>
+                <option value="Wheat" data-i18n="crop_Wheat">Wheat</option>
+                <option value="Rice" data-i18n="crop_Rice">Rice</option>
+                <option value="Corn" data-i18n="crop_Corn">Corn</option>
+                <option value="Sugarcane" data-i18n="crop_Sugarcane">Sugarcane</option>
+                <option value="Cotton" data-i18n="crop_Cotton">Cotton</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="password_label">Password</label>
+              <input type="password" id="reg-pwd" required data-i18n="password_placeholder" placeholder="Enter password" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+            </div>
+            <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 rounded-md hover:bg-green-700 transition" data-i18n="register_btn">Register</button>
+          </form>
+
+          <div class="mt-4 text-center">
+            <button id="btn-show-login" class="text-sm text-green-600 hover:text-green-800" data-i18n="login_prompt">Already registered? Login here</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="view-dashboard" class="hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        
+        <!-- Farmer Info Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500 flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800"><span data-i18n="dash_welcome">Welcome</span>, <span id="dash-name">--</span></h2>
+            <div class="text-gray-600 mt-2 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6">
+               <span class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-1"></i> <span data-i18n="dash_village" class="mr-1">Village:</span> <b id="dash-village">--</b></span>
+               <span class="flex items-center"><i data-lucide="wheat" class="w-4 h-4 mr-1 text-green-600"></i> <span data-i18n="dash_crop" class="mr-1">Crop:</span> 
+                  <select id="dash-crop" class="bg-gray-100 border-none font-bold py-0.5 px-2 rounded form-select ml-1 hover:bg-gray-200 focus:ring-0">
+                    <option value="Tomato" data-i18n="crop_Tomato">Tomato</option>
+                    <option value="Potato" data-i18n="crop_Potato">Potato</option>
+                    <option value="Wheat" data-i18n="crop_Wheat">Wheat</option>
+                    <option value="Rice" data-i18n="crop_Rice">Rice</option>
+                    <option value="Corn" data-i18n="crop_Corn">Corn</option>
+                    <option value="Sugarcane" data-i18n="crop_Sugarcane">Sugarcane</option>
+                    <option value="Cotton" data-i18n="crop_Cotton">Cotton</option>
+                  </select>
+               </span>
+            </div>
+          </div>
+          <div class="mt-4 md:mt-0 text-right">
+             <div class="text-sm text-gray-500" data-i18n="weather_title">Weather Advisory</div>
+             <div id="weather-info" class="font-bold flex items-center space-x-2 text-green-700">
+               <i data-lucide="cloud-rain" class="w-5 h-5"></i> <span>28°C, Light Rain</span>
+             </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left Col: Upload & Basic Info -->
+          <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+               <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center"><i data-lucide="upload-cloud" class="w-5 h-5 mr-2 text-green-500"></i> <span data-i18n="upload_title">Crop Image Upload</span></h3>
+               
+               <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
+                  <div id="preview-container" class="hidden relative mb-4">
+                     <img id="image-preview" class="max-h-48 mx-auto rounded-md object-cover relative z-0" src="" alt="Preview">
+                     <button id="btn-remove-img" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 z-10 hover:bg-red-600 shadow-md"><i data-lucide="x" class="w-4 h-4"></i></button>
+                  </div>
+                  <div id="upload-prompt">
+                     <i data-lucide="image" class="w-10 h-10 text-gray-400 mx-auto mb-2"></i>
+                     <p class="text-sm text-gray-500" data-i18n="upload_instructions">Click or drag & drop a plant image</p>
+                  </div>
+                  <input type="file" id="file-input" class="hidden" accept="image/*">
+               </div>
+
+               <button id="btn-analyze" disabled class="w-full mt-4 bg-green-600 text-white font-bold py-3 rounded-lg shadow disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700 transition flex items-center justify-center space-x-2">
+                 <i data-lucide="wand-2" class="w-5 h-5"></i>
+                 <span data-i18n="analyze_btn">Analyze Crop Health</span>
+               </button>
+            </div>
+            
+            <!-- Result: Alerts -->
+            <div id="result-alerts-card" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hidden">
+                <h3 class="font-bold text-gray-800 text-lg mb-3 flex items-center"><i data-lucide="alert-triangle" class="w-5 h-5 mr-2 text-orange-500"></i> <span data-i18n="alerts_title">Issue Detection Alerts</span></h3>
+                <div id="alerts-list" class="space-y-2">
+                   <!-- Injected dynamically -->
+                </div>
+            </div>
+          </div>
+
+          <!-- Right Col: Report -->
+          <div class="lg:col-span-2 space-y-6">
+             
+             <!-- Loading State -->
+             <div id="loading-state" class="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center hidden">
+                <div class="spinner mb-4"></div>
+                <h3 class="text-lg font-medium text-gray-600 animate-pulse" data-i18n="analyzing_text">Analyzing Crop Health with AI...</h3>
+             </div>
+
+             <!-- Main Report Card -->
+             <div id="report-card" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hidden">
+                <div class="bg-green-50 px-6 py-4 border-b border-green-100 flex justify-between items-center">
+                   <h3 class="font-bold text-gray-800 text-lg flex items-center"><i data-lucide="file-check" class="w-5 h-5 mr-2 text-green-600"></i> <span data-i18n="report_title">Monitoring Report</span></h3>
+                   <button id="btn-listen" class="text-sm bg-white border border-gray-300 px-3 py-1 rounded-md shadow-sm hover:bg-gray-50 flex items-center"><span data-i18n="listen_btn">🔊 Listen Advice</span></button>
+                </div>
+                <div class="p-6">
+                   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                      <div class="bg-gray-50 p-4 rounded-lg text-center border">
+                         <div class="text-xs text-gray-500 uppercase tracking-wide mb-1" data-i18n="health_score">Health Score</div>
+                         <div class="text-3xl font-black text-green-600" id="res-score">--%</div>
+                      </div>
+                      <div class="bg-gray-50 p-4 rounded-lg text-center border">
+                         <div class="text-xs text-gray-500 uppercase tracking-wide mb-1" data-i18n="status_label">Status</div>
+                         <div class="text-lg font-bold text-gray-800 mt-1" id="res-status">--</div>
+                      </div>
+                      <div class="bg-gray-50 p-4 rounded-lg text-center border">
+                         <div class="text-xs text-gray-500 uppercase tracking-wide mb-1" data-i18n="disease_detected">Disease Risk</div>
+                         <div class="text-base font-bold text-red-500 break-words mt-1 leading-snug h-12 flex items-center justify-center text-center" id="res-disease">None</div>
+                      </div>
+                      <div class="bg-gray-50 p-4 rounded-lg text-center border">
+                         <div class="text-xs text-gray-500 uppercase tracking-wide mb-1" data-i18n="confidence_label">Confidence</div>
+                         <div class="text-2xl font-bold text-blue-600 mt-1" id="res-confidence">--%</div>
+                      </div>
+                   </div>
+
+                   <hr class="mb-6">
+
+                   <h4 class="font-bold text-lg mb-4 flex items-center"><i data-lucide="sprout" class="w-5 h-5 mr-2 text-green-600"></i> <span data-i18n="management_title">Field Management Support</span></h4>
+                   <div class="space-y-4">
+                      
+                      <div class="flex items-start">
+                         <div class="flex-shrink-0 bg-blue-100 p-2 rounded-full mt-1">
+                            <i data-lucide="droplet" class="w-4 h-4 text-blue-600"></i>
+                         </div>
+                         <div class="ml-4">
+                            <div class="text-sm font-semibold text-gray-900" data-i18n="irrigation_rec">Irrigation Action:</div>
+                            <div class="text-gray-700" id="res-irrigation">--</div>
+                         </div>
+                      </div>
+
+                      <div class="flex items-start">
+                         <div class="flex-shrink-0 bg-amber-100 p-2 rounded-full mt-1">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i>
+                         </div>
+                         <div class="ml-4">
+                            <div class="text-sm font-semibold text-gray-900" data-i18n="fertilizer_rec">Fertilizer Recommendation:</div>
+                            <div class="text-gray-700" id="res-fertilizer">--</div>
+                         </div>
+                      </div>
+
+                      <div class="flex items-start">
+                         <div class="flex-shrink-0 bg-green-100 p-2 rounded-full mt-1">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-green-600"></i>
+                         </div>
+                         <div class="ml-4 w-full">
+                            <div class="text-sm font-semibold text-gray-900 mb-1" data-i18n="advice_rec">Prevention & Management Tips:</div>
+                            <ul class="list-disc leading-relaxed text-gray-700 ml-4 space-y-1 text-sm md:text-base" id="res-tips">
+                               <li>--</li>
+                            </ul>
+                            <!-- Field Management Text Context -->
+                            <div class="mt-3 bg-gray-50 border p-3 rounded text-sm text-gray-600 italic border-l-4 border-l-green-400" id="res-management">
+                               --
+                            </div>
+                         </div>
+                      </div>
+                      
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+        <!-- Full-Width History Panel -->
+        <div id="history-section" class="w-full bg-white border-t border-gray-200 mt-12 py-10 px-4 sm:px-6 lg:px-8">
+          <div class="w-full max-w-[95%] mx-auto space-y-6">
+             <div class="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 space-y-4 md:space-y-0">
+                 <h3 class="font-black text-gray-800 text-2xl flex items-center">
+                    <i data-lucide="history" class="w-6 h-6 mr-3 text-green-600"></i> 
+                    <span data-i18n="history_title">Detection History</span>
+                 </h3>
+                 
+                 <!-- Search and Filter Controls -->
+                 <div class="flex flex-wrap gap-3 items-center">
+                    <div class="relative">
+                       <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-gray-400"></i>
+                       <input type="text" id="history-search" placeholder="Search..." data-i18n="search_placeholder" class="pl-9 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm bg-gray-50 w-64">
+                    </div>
+                    
+                    <select id="history-filter-crop" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm bg-gray-50">
+                       <option value="all" data-i18n="filter_crop_all">All Crops</option>
+                       <option value="Tomato" data-i18n="crop_Tomato">Tomato</option>
+                       <option value="Potato" data-i18n="crop_Potato">Potato</option>
+                       <option value="Wheat" data-i18n="crop_Wheat">Wheat</option>
+                       <option value="Rice" data-i18n="crop_Rice">Rice</option>
+                       <option value="Corn" data-i18n="crop_Corn">Corn</option>
+                       <option value="Sugarcane" data-i18n="crop_Sugarcane">Sugarcane</option>
+                       <option value="Cotton" data-i18n="crop_Cotton">Cotton</option>
+                    </select>
+
+                    <select id="history-filter-status" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm bg-gray-50">
+                       <option value="all" data-i18n="filter_status_all">All Statuses</option>
+                       <option value="Healthy" data-i18n="status_healthy">Healthy</option>
+                       <option value="Mild Risk" data-i18n="status_mild">Mild Risk</option>
+                       <option value="Moderate Risk" data-i18n="status_moderate">Moderate Risk</option>
+                       <option value="High Risk" data-i18n="status_high">High Risk</option>
+                    </select>
+                 </div>
+             </div>
+             
+             <!-- Crop Recommendations Card -->
+             <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3 space-y-2 sm:space-y-0">
+                     <h4 class="font-black text-gray-800 text-lg flex items-center">
+                        <i data-lucide="book-open" class="w-5 h-5 mr-2 text-green-600"></i>
+                        <span data-i18n="crop_advisory_title">Crop Advisory & Best Practices</span>
+                     </h4>
+                     <div class="flex items-center space-x-2">
+                         <span class="text-xs bg-green-100 text-green-800 font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                            <span data-i18n="weather_sync_badge">Weather Synced</span>
+                         </span>
+                     </div>
+                 </div>
+                 
+                 <!-- Crop Tab Pills -->
+                 <div class="flex flex-wrap gap-2 pb-2" id="crop-rec-tabs">
+                     <!-- Rendered dynamically -->
+                 </div>
+
+                 <!-- Content Display -->
+                 <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-inner grid grid-cols-1 md:grid-cols-2 gap-6" id="crop-rec-content">
+                     <!-- Left Side: Basic requirements -->
+                     <div class="space-y-4">
+                         <div>
+                             <h5 class="text-xs uppercase tracking-wider text-gray-400 font-bold mb-1" data-i18n="optimal_conditions_label">Optimal Growing Conditions</h5>
+                             <div class="space-y-2 text-sm text-gray-700">
+                                 <div class="flex items-center"><i data-lucide="thermometer" class="w-4 h-4 mr-2 text-orange-500"></i> <span data-i18n="optimal_temp_label" class="font-medium mr-1">Temperature:</span> <span id="rec-temp" class="font-semibold text-gray-800">--</span></div>
+                                 <div class="flex items-center"><i data-lucide="droplets" class="w-4 h-4 mr-2 text-blue-500"></i> <span data-i18n="optimal_soil_label" class="font-medium mr-1">Soil Type:</span> <span id="rec-soil" class="font-semibold text-gray-800">--</span></div>
+                             </div>
+                         </div>
+                         <div>
+                             <h5 class="text-xs uppercase tracking-wider text-gray-400 font-bold mb-1" data-i18n="pest_disease_watch">Common Pests & Diseases</h5>
+                             <div class="text-sm text-red-600 font-semibold flex items-center">
+                                 <i data-lucide="bug" class="w-4 h-4 mr-2 text-red-500"></i>
+                                 <span id="rec-pests">--</span>
+                             </div>
+                         </div>
+                     </div>
+                     <!-- Right Side: Best practices and Weather alert -->
+                     <div class="space-y-4">
+                         <div>
+                             <h5 class="text-xs uppercase tracking-wider text-gray-400 font-bold mb-1" data-i18n="fertilizer_guide_label">Best Fertilization Practices</h5>
+                             <p class="text-sm text-gray-700 leading-relaxed font-medium" id="rec-fertilizer-guide">--</p>
+                         </div>
+                         <div class="bg-green-50 p-3 rounded-lg border border-green-100 flex items-start space-x-3">
+                             <i data-lucide="cloud-sun" class="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" id="rec-weather-icon"></i>
+                             <div class="text-xs text-green-950 leading-relaxed">
+                                 <div class="font-bold mb-0.5" data-i18n="weather_actionable_tip">Weather-Synced Field Action</div>
+                                 <div id="rec-weather-advisory" class="font-semibold text-green-900">--</div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Table Container (Stretching) -->
+             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden w-full">
+                <div class="overflow-x-auto w-full">
+                   <table class="min-w-full divide-y divide-gray-200">
+                      <thead class="bg-gray-50">
+                         <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="hist_image">Image</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="hist_date">Date</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="hist_crop">Crop</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell" data-i18n="hist_score">Health</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="hist_status">Status</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell" data-i18n="disease_detected">Disease Risk</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"></th>
+                         </tr>
+                      </thead>
+                      <tbody id="history-table-body" class="bg-white divide-y divide-gray-200">
+                         <tr><td colspan="7" class="px-6 py-6 text-center text-sm text-gray-500" data-i18n="no_records">No records found.</td></tr>
+                      </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+        </div>
+
+        <!-- Report Details Modal -->
+        <div id="report-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto flex flex-col transform scale-95 transition-all duration-300">
+            <!-- Modal Header -->
+            <div class="bg-green-700 text-white px-6 py-4 flex justify-between items-center rounded-t-2xl">
+              <h3 class="font-bold text-lg flex items-center">
+                <i data-lucide="file-check" class="w-5 h-5 mr-2"></i>
+                <span data-i18n="modal_report_details">Historical Report Details</span>
+              </h3>
+              <button id="modal-close" class="text-white hover:text-green-200 focus:outline-none">
+                <i data-lucide="x" class="w-6 h-6"></i>
+              </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-6 space-y-6 overflow-y-auto">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Left Column: Image -->
+                <div class="md:col-span-1 space-y-4">
+                  <div class="border rounded-xl p-2 bg-gray-50 flex items-center justify-center">
+                    <img id="modal-img" src="" alt="Analyzed crop" class="max-h-64 object-contain rounded-lg shadow-sm w-full">
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-xl border space-y-3">
+                     <div class="text-xs text-gray-500 uppercase tracking-wide" data-i18n="hist_date">Date</div>
+                     <div id="modal-date" class="font-bold text-gray-800 text-sm">--</div>
+                     <div class="text-xs text-gray-500 uppercase tracking-wide" data-i18n="hist_crop">Crop</div>
+                     <div id="modal-crop" class="font-bold text-gray-800 text-sm">--</div>
+                     <div class="text-xs text-gray-500 uppercase tracking-wide" data-i18n="weather_title">Weather Advisory</div>
+                     <div id="modal-weather" class="font-bold text-gray-800 text-sm">--</div>
+                  </div>
+                </div>
+                
+                <!-- Right Column: Stats and Recommendations -->
+                <div class="md:col-span-2 space-y-6">
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-gray-50 p-3 rounded-lg text-center border">
+                       <div class="text-xs text-gray-500 uppercase tracking-wide mb-1" data-i18n="health_score">Health Score</div>
+                       <div class="text-2xl font-black text-green-600" id="modal-score">--%</div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg text-center border">
+                       <div class="text-xs text-gray-500 uppercase tracking-wide mb-1" data-i18n="status_label">Status</div>
+                       <div class="text-sm font-bold text-gray-800 mt-1" id="modal-status">--</div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg text-center border">
+                       <div class="text-xs text-gray-500 uppercase tracking-wide mb-1" data-i18n="disease_detected">Disease Risk</div>
+                       <div class="text-xs font-bold text-red-500 break-words mt-1 leading-tight h-10 flex items-center justify-center text-center" id="modal-disease">--</div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg text-center border">
+                       <div class="text-xs text-gray-500 uppercase tracking-wide mb-1" data-i18n="confidence_label">Confidence</div>
+                       <div class="text-xl font-bold text-blue-600 mt-1" id="modal-confidence">--%</div>
+                    </div>
+                  </div>
+                  
+                  <hr>
+                  
+                  <div class="space-y-4">
+                     <div class="flex items-start">
+                        <div class="flex-shrink-0 bg-blue-100 p-2 rounded-full mt-1">
+                           <i data-lucide="droplet" class="w-4 h-4 text-blue-600"></i>
+                        </div>
+                        <div class="ml-3">
+                           <div class="text-sm font-semibold text-gray-900" data-i18n="irrigation_rec">Irrigation Action:</div>
+                           <div class="text-gray-700 text-sm" id="modal-irrigation">--</div>
+                        </div>
+                     </div>
+
+                     <div class="flex items-start">
+                        <div class="flex-shrink-0 bg-amber-100 p-2 rounded-full mt-1">
+                           <i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i>
+                        </div>
+                        <div class="ml-3">
+                           <div class="text-sm font-semibold text-gray-900" data-i18n="fertilizer_rec">Fertilizer Recommendation:</div>
+                           <div class="text-gray-700 text-sm" id="modal-fertilizer">--</div>
+                        </div>
+                     </div>
+
+                     <div class="flex items-start">
+                        <div class="flex-shrink-0 bg-green-100 p-2 rounded-full mt-1">
+                           <i data-lucide="shield-check" class="w-4 h-4 text-green-600"></i>
+                        </div>
+                        <div class="ml-3 w-full">
+                           <div class="text-sm font-semibold text-gray-900 mb-1" data-i18n="advice_rec">Prevention & Management Tips:</div>
+                           <ul class="list-disc leading-relaxed text-gray-700 ml-4 space-y-1 text-xs" id="modal-tips">
+                              <li>--</li>
+                           </ul>
+                           <div class="mt-3 bg-gray-50 border p-3 rounded text-xs text-gray-600 italic border-l-4 border-l-green-400" id="modal-management">
+                              --
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row gap-3 justify-between items-stretch sm:items-center rounded-b-2xl border-t">
+              <button id="modal-delete-btn" class="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition flex items-center justify-center space-x-1 text-sm w-full sm:w-auto">
+                 <i data-lucide="trash-2" class="w-4 h-4"></i>
+                 <span data-i18n="delete_btn">Delete Record</span>
+              </button>
+              
+              <div class="flex flex-col sm:flex-row gap-3 sm:space-x-3 w-full sm:w-auto">
+                 <button id="modal-listen-btn" class="px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center justify-center space-x-1 text-sm w-full sm:w-auto">
+                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                    <span data-i18n="listen_btn">🔊 Listen Advice</span>
+                 </button>
+                 <button id="modal-close-btn" class="px-4 py-2 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition text-sm w-full sm:w-auto text-center" data-i18n="close_btn">
+                    Close
+                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      </div>
+    <!-- Profile Page View -->
+    <div id="view-profile" class="hidden">
+      <div class="max-w-3xl mx-auto px-4 py-12">
+           <div class="bg-white rounded-xl shadow-sm p-8 border-t-4 border-green-500">
+               <h3 class="font-bold text-gray-800 text-2xl mb-8 pb-4 border-b flex items-center"><i data-lucide="user" class="w-6 h-6 mr-3 text-green-600"></i> <span data-i18n="profile_title">Farmer Profile</span></h3>
+               
+               <div class="flex flex-col items-center mb-8">
+                  <div class="w-32 h-32 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-5xl font-bold mb-4 shadow-inner" id="profile-initial-page">--</div>
+                  <h2 class="text-3xl font-bold text-gray-800 text-center capitalize" id="profile-name-page">--</h2>
+               </div>
+               
+               <!-- Profile View Mode -->
+               <div id="profile-view-mode" class="space-y-6 mb-10 w-full max-w-sm mx-auto">
+                  <div class="flex items-center text-gray-600">
+                      <i data-lucide="phone" class="w-6 h-6 mr-4 text-green-600"></i>
+                      <div>
+                         <div class="text-sm text-gray-400 capitalize" data-i18n="phone_label">Phone Number</div>
+                         <div class="font-bold text-lg" id="profile-phone-page">--</div>
+                      </div>
+                  </div>
+                  <div class="flex items-center text-gray-600">
+                      <i data-lucide="map-pin" class="w-6 h-6 mr-4 text-green-600"></i>
+                      <div>
+                         <div class="text-sm text-gray-400 capitalize" data-i18n="village_label">Village</div>
+                         <div class="font-bold text-lg" id="profile-village-page">--</div>
+                      </div>
+                  </div>
+                  <div class="flex items-center text-gray-600">
+                      <i data-lucide="wheat" class="w-6 h-6 mr-4 text-green-600"></i>
+                      <div class="w-full">
+                         <div class="text-sm text-gray-400 capitalize" data-i18n="crop_label">Primary Crop</div>
+                         <div class="font-bold text-lg" id="profile-crop-page">--</div>
+                      </div>
+                  </div>
+                  
+                  <div class="flex justify-center pt-4">
+                     <button id="btn-edit-profile" class="px-6 py-2.5 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center space-x-2">
+                        <i data-lucide="edit" class="w-4 h-4"></i>
+                        <span data-i18n="edit_profile_btn">Edit Profile</span>
+                     </button>
+                  </div>
+               </div>
+
+               <!-- Profile Edit Mode -->
+               <form id="profile-edit-mode" class="hidden space-y-4 w-full max-w-sm mx-auto mb-10">
+                  <div>
+                     <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="name_label">Full Name</label>
+                     <input type="text" id="edit-profile-name" required class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+                  </div>
+                  <div>
+                     <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="village_label">Village Name</label>
+                     <input type="text" id="edit-profile-village" required class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+                  </div>
+                  <div>
+                     <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="crop_label">Primary Crop</label>
+                     <select id="edit-profile-crop" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
+                        <option value="Tomato" data-i18n="crop_Tomato">Tomato</option>
+                        <option value="Potato" data-i18n="crop_Potato">Potato</option>
+                        <option value="Wheat" data-i18n="crop_Wheat">Wheat</option>
+                        <option value="Rice" data-i18n="crop_Rice">Rice</option>
+                        <option value="Corn" data-i18n="crop_Corn">Corn</option>
+                        <option value="Sugarcane" data-i18n="crop_Sugarcane">Sugarcane</option>
+                        <option value="Cotton" data-i18n="crop_Cotton">Cotton</option>
+                     </select>
+                  </div>
+                  
+                  <div class="flex justify-end space-x-3 pt-4">
+                     <button type="button" id="btn-cancel-edit" class="px-4 py-2 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition" data-i18n="cancel_btn">Cancel</button>
+                     <button type="submit" class="px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition" data-i18n="save_btn">Save</button>
+                  </div>
+               </form>
+
+               <div class="flex justify-center border-t pt-6">
+                 <button id="btn-page-logout" class="px-8 py-3 flex items-center space-x-2 text-red-600 border border-red-200 bg-red-50 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span data-i18n="nav_logout" class="font-bold">Logout</span>
+                 </button>
+               </div>
+           </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/src/script.js"></script>
+</body>
+</html>
