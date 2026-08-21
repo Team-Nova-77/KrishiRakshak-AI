@@ -1,15 +1,13 @@
-import { createApp } from '../src/backend/server';
-import { IncomingMessage, ServerResponse } from 'http';
+import { createApp } from '../src/backend/server.js';
 
-let appPromise: any = null;
+let appInstance: any = null;
 
-export default async function handler(req: IncomingMessage, res: ServerResponse) {
+export default async function handler(req: any, res: any) {
     try {
-        if (!appPromise) {
-            appPromise = createApp();
+        if (!appInstance) {
+            appInstance = await createApp();
         }
-        const app = await appPromise;
-        return app(req, res);
+        return appInstance(req, res);
     } catch (err: any) {
         console.error('[Vercel Serverless Function Error]', err);
         res.statusCode = 500;
@@ -20,5 +18,3 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         }));
     }
 }
-
-
