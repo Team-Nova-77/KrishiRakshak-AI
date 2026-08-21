@@ -359,7 +359,7 @@ function initEventListeners() {
                 },
                 body: JSON.stringify({ name, village, crop_type, district, state: stateName, land_size, soil_type, farming_type })
             });
-            const json = await res.json();
+            const json = await parseJsonResponse(res);
             if (res.ok && json.success) {
                 state.user = json.farmer;
                 localStorage.setItem('krishi_user', JSON.stringify(json.farmer));
@@ -583,8 +583,8 @@ async function handleRegister(e: Event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error);
+        const json = await parseJsonResponse(res);
+        if (!res.ok) throw new Error(json.error || 'Registration failed');
         finishLogin(json);
     } catch (err: any) { alert(err.message); }
 }
@@ -601,8 +601,8 @@ async function handleLogin(e: Event) {
                 password: (document.getElementById('login-pwd') as HTMLInputElement)?.value || ''
             })
         });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error);
+        const json = await parseJsonResponse(res);
+        if (!res.ok) throw new Error(json.error || 'Invalid phone number or password');
         finishLogin(json);
     } catch (err: any) { alert(err.message); }
 }
@@ -700,8 +700,8 @@ async function handleAnalysis() {
             credentials: 'include',
             body: fd
         });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error);
+        const json = await parseJsonResponse(res);
+        if (!res.ok) throw new Error(json.error || 'Analysis failed');
         
         displayReport(json.result);
         fetchHistory();
@@ -819,7 +819,7 @@ async function fetchHistory() {
             logout();
             return;
         }
-        const json = await res.json();
+        const json = await parseJsonResponse(res);
         if (json.success) {
             state.history = json.history;
             filterAndRenderHistory();
@@ -1129,7 +1129,7 @@ async function deleteRecord(id: number) {
             method: 'DELETE',
             credentials: 'include'
         });
-        const json = await res.json();
+        const json = await parseJsonResponse(res);
         if (res.ok && json.success) {
             state.history = state.history.filter(r => r.id !== id);
             filterAndRenderHistory();
