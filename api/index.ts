@@ -1,4 +1,4 @@
-import { createApp } from '../src/backend/server.js';
+import { createApp } from '../src/backend/server';
 import { IncomingMessage, ServerResponse } from 'http';
 
 let appPromise: any = null;

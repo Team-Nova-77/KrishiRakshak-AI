@@ -23,6 +23,9 @@ if (!fs.existsSync(uploadsDir)) {
 export async function createApp() {
     const app = express();
 
+    // Enable trust proxy for Vercel reverse proxy IP headers & rate limiters
+    app.set('trust proxy', 1);
+
     // Security HTTP Headers
     app.use(helmet({ contentSecurityPolicy: false }));
 
@@ -34,7 +37,7 @@ export async function createApp() {
     const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000').split(',').map(s => s.trim());
     app.use(cors({
         origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+            if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app') || process.env.VERCEL || process.env.NODE_ENV !== 'production') {
                 callback(null, true);
             } else {
                 callback(new Error('Cross-Origin Request Blocked by CORS Security Policy'));
