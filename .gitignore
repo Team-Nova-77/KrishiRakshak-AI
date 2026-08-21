@@ -1,0 +1,22 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Database & SQLite files
+database.sqlite
+database.sqlite-journal
+
+# Uploads
+uploads/
+
+# IDE & OS files
+.DS_Store
+*.log

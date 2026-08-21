@@ -34,6 +34,24 @@ export async function initDb() {
       FOREIGN KEY(farmer_id) REFERENCES farmers(id)
     );
 
+    CREATE TABLE IF NOT EXISTS refresh_tokens (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      farmer_id INTEGER NOT NULL,
+      token_hash TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      revoked INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY(farmer_id) REFERENCES farmers(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS otp_codes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      phone TEXT NOT NULL,
+      otp_code TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      verified INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
   `);
   
   try {
@@ -42,6 +60,14 @@ export async function initDb() {
   try {
     dbInstance.exec("ALTER TABLE history ADD COLUMN weather_cond TEXT;");
   } catch (e) {}
+
+  // Farmer Extended Profile Migrations
+  try { dbInstance.exec("ALTER TABLE farmers ADD COLUMN district TEXT;"); } catch (e) {}
+  try { dbInstance.exec("ALTER TABLE farmers ADD COLUMN state TEXT;"); } catch (e) {}
+  try { dbInstance.exec("ALTER TABLE farmers ADD COLUMN land_size TEXT;"); } catch (e) {}
+  try { dbInstance.exec("ALTER TABLE farmers ADD COLUMN soil_type TEXT;"); } catch (e) {}
+  try { dbInstance.exec("ALTER TABLE farmers ADD COLUMN farming_type TEXT;"); } catch (e) {}
+
   
   return getDb();
 }

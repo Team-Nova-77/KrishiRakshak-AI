@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KrishiRakshak AI</title>
-  <link rel="stylesheet" href="/src/style.css">
+  <link rel="stylesheet" href="/src/frontend/styles/style.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1"></script>
@@ -15,7 +15,7 @@
   <nav class="bg-green-700 text-white shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <div class="flex items-center space-x-2">
+        <div id="brand-logo" class="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity">
           <i data-lucide="leaf" class="w-8 h-8"></i>
           <span class="font-bold text-xl tracking-tight" data-i18n="app_title">KrishiRakshak AI</span>
         </div>
@@ -35,14 +35,18 @@
               <span class="hidden sm:inline" data-i18n="nav_login">Login</span>
             </button>
           </div>
-          <div id="nav-user-links" class="hidden space-x-4">
+          <div id="nav-user-links" class="hidden space-x-4 items-center">
+            <button id="btn-nav-dash" class="hover:text-green-200 transition-colors flex items-center space-x-1 focus:outline-none">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span class="hidden sm:inline" data-i18n="nav_dashboard">Dashboard</span>
+            </button>
             <button id="btn-nav-profile" class="hover:text-green-200 transition-colors flex items-center space-x-1 focus:outline-none">
               <i data-lucide="user" class="w-5 h-5"></i>
               <span class="hidden sm:inline" data-i18n="nav_profile">Profile</span>
             </button>
-            <button id="btn-nav-dash" class="hover:text-green-200 transition-colors flex items-center space-x-1 focus:outline-none">
-              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-              <span class="hidden sm:inline" data-i18n="nav_dashboard">Dashboard</span>
+            <button id="btn-nav-logout" class="px-3 py-1 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors flex items-center space-x-1 focus:outline-none">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+              <span class="hidden sm:inline" data-i18n="nav_logout">Logout</span>
             </button>
           </div>
         </div>
@@ -533,76 +537,192 @@
 
 
       </div>
+      </div>
     <!-- Profile Page View -->
     <div id="view-profile" class="hidden">
-      <div class="max-w-3xl mx-auto px-4 py-12">
-           <div class="bg-white rounded-xl shadow-sm p-8 border-t-4 border-green-500">
-               <h3 class="font-bold text-gray-800 text-2xl mb-8 pb-4 border-b flex items-center"><i data-lucide="user" class="w-6 h-6 mr-3 text-green-600"></i> <span data-i18n="profile_title">Farmer Profile</span></h3>
-               
-               <div class="flex flex-col items-center mb-8">
-                  <div class="w-32 h-32 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-5xl font-bold mb-4 shadow-inner" id="profile-initial-page">--</div>
-                  <h2 class="text-3xl font-bold text-gray-800 text-center capitalize" id="profile-name-page">--</h2>
-               </div>
-               
-               <!-- Profile View Mode -->
-               <div id="profile-view-mode" class="space-y-6 mb-10 w-full max-w-sm mx-auto">
-                  <div class="flex items-center text-gray-600">
-                      <i data-lucide="phone" class="w-6 h-6 mr-4 text-green-600"></i>
-                      <div>
-                         <div class="text-sm text-gray-400 capitalize" data-i18n="phone_label">Phone Number</div>
-                         <div class="font-bold text-lg" id="profile-phone-page">--</div>
-                      </div>
-                  </div>
-                  <div class="flex items-center text-gray-600">
-                      <i data-lucide="map-pin" class="w-6 h-6 mr-4 text-green-600"></i>
-                      <div>
-                         <div class="text-sm text-gray-400 capitalize" data-i18n="village_label">Village</div>
-                         <div class="font-bold text-lg" id="profile-village-page">--</div>
-                      </div>
-                  </div>
-                  <div class="flex items-center text-gray-600">
-                      <i data-lucide="wheat" class="w-6 h-6 mr-4 text-green-600"></i>
-                      <div class="w-full">
-                         <div class="text-sm text-gray-400 capitalize" data-i18n="crop_label">Primary Crop</div>
-                         <div class="font-bold text-lg" id="profile-crop-page">--</div>
-                      </div>
-                  </div>
-                  
-                  <div class="flex justify-center pt-4">
-                     <button id="btn-edit-profile" class="px-6 py-2.5 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center space-x-2">
-                        <i data-lucide="edit" class="w-4 h-4"></i>
-                        <span data-i18n="edit_profile_btn">Edit Profile</span>
-                     </button>
-                  </div>
+      <div class="max-w-4xl mx-auto px-4 py-10 space-y-6">
+           <div class="bg-white rounded-2xl shadow-sm p-8 border-t-4 border-green-500">
+               <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b mb-8 space-y-4 md:space-y-0">
+                   <h3 class="font-bold text-gray-800 text-2xl flex items-center">
+                       <i data-lucide="user" class="w-7 h-7 mr-3 text-green-600"></i> 
+                       <span data-i18n="profile_title">Farmer Profile & Yield Dashboard</span>
+                   </h3>
+                   <button id="btn-edit-profile" class="px-5 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center space-x-2 text-sm shadow-sm">
+                       <i data-lucide="edit" class="w-4 h-4"></i>
+                       <span data-i18n="edit_profile_btn">Edit Profile</span>
+                   </button>
                </div>
 
-               <!-- Profile Edit Mode -->
-               <form id="profile-edit-mode" class="hidden space-y-4 w-full max-w-sm mx-auto mb-10">
-                  <div>
-                     <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="name_label">Full Name</label>
-                     <input type="text" id="edit-profile-name" required class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
-                  </div>
-                  <div>
-                     <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="village_label">Village Name</label>
-                     <input type="text" id="edit-profile-village" required class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
-                  </div>
-                  <div>
-                     <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="crop_label">Primary Crop</label>
-                     <select id="edit-profile-crop" class="w-full px-4 py-2 border rounded-md focus:ring-green-500 focus:border-green-500">
-                        <option value="Tomato" data-i18n="crop_Tomato">Tomato</option>
-                        <option value="Potato" data-i18n="crop_Potato">Potato</option>
-                        <option value="Wheat" data-i18n="crop_Wheat">Wheat</option>
-                        <option value="Rice" data-i18n="crop_Rice">Rice</option>
-                        <option value="Corn" data-i18n="crop_Corn">Corn</option>
-                        <option value="Sugarcane" data-i18n="crop_Sugarcane">Sugarcane</option>
-                        <option value="Cotton" data-i18n="crop_Cotton">Cotton</option>
-                     </select>
-                  </div>
-                  
-                  <div class="flex justify-end space-x-3 pt-4">
-                     <button type="button" id="btn-cancel-edit" class="px-4 py-2 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition" data-i18n="cancel_btn">Cancel</button>
-                     <button type="submit" class="px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition" data-i18n="save_btn">Save</button>
-                  </div>
+               <!-- Farmer Info Header & Stats -->
+               <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                   <!-- Avatar & Identity Card -->
+                   <div class="lg:col-span-1 bg-green-50/60 p-6 rounded-2xl border border-green-100 flex flex-col items-center justify-center text-center">
+                       <div class="w-24 h-24 bg-green-600 text-white rounded-full flex items-center justify-center text-4xl font-black mb-3 shadow-md" id="profile-initial-page">--</div>
+                       <h2 class="text-2xl font-extrabold text-gray-800 capitalize" id="profile-name-page">--</h2>
+                       <div class="text-sm font-semibold text-green-700 mt-1 flex items-center justify-center">
+                           <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                           <span id="profile-location-page">--</span>
+                       </div>
+                       <div class="text-xs text-gray-500 mt-1 flex items-center justify-center">
+                           <i data-lucide="phone" class="w-3.5 h-3.5 mr-1"></i>
+                           <span id="profile-phone-page">--</span>
+                       </div>
+                   </div>
+
+                   <!-- Diagnostic Overview Counters -->
+                   <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                       <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 flex flex-col items-center justify-center text-center">
+                           <div class="p-3 bg-blue-100 text-blue-600 rounded-full mb-2">
+                               <i data-lucide="activity" class="w-6 h-6"></i>
+                           </div>
+                           <div class="text-3xl font-black text-gray-800" id="profile-stat-total">0</div>
+                           <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1" data-i18n="total_scans_label">Total Scans</div>
+                       </div>
+                       <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 flex flex-col items-center justify-center text-center">
+                           <div class="p-3 bg-green-100 text-green-600 rounded-full mb-2">
+                               <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                           </div>
+                           <div class="text-3xl font-black text-green-600" id="profile-stat-healthy">0</div>
+                           <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1" data-i18n="healthy_scans_label">Healthy Yields</div>
+                       </div>
+                       <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 flex flex-col items-center justify-center text-center">
+                           <div class="p-3 bg-orange-100 text-orange-600 rounded-full mb-2">
+                               <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                           </div>
+                           <div class="text-3xl font-black text-orange-600" id="profile-stat-risks">0</div>
+                           <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1" data-i18n="risk_alerts_label">Risk Alerts</div>
+                       </div>
+                   </div>
+               </div>
+
+               <!-- Farm Agricultural Specifications Badges -->
+               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                   <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 flex items-center space-x-3">
+                       <div class="p-3 bg-emerald-100 text-emerald-700 rounded-lg">
+                           <i data-lucide="ruler" class="w-5 h-5"></i>
+                       </div>
+                       <div>
+                           <div class="text-xs font-bold text-gray-400 uppercase">Farm Size</div>
+                           <div class="text-base font-extrabold text-gray-800" id="profile-land-page">-- Acres</div>
+                       </div>
+                   </div>
+                   <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-100 flex items-center space-x-3">
+                       <div class="p-3 bg-amber-100 text-amber-700 rounded-lg">
+                           <i data-lucide="layers" class="w-5 h-5"></i>
+                       </div>
+                       <div>
+                           <div class="text-xs font-bold text-gray-400 uppercase">Soil Type</div>
+                           <div class="text-base font-extrabold text-gray-800" id="profile-soil-page">--</div>
+                       </div>
+                   </div>
+                   <div class="bg-teal-50/60 p-4 rounded-xl border border-teal-100 flex items-center space-x-3">
+                       <div class="p-3 bg-teal-100 text-teal-700 rounded-lg">
+                           <i data-lucide="sun-plant" class="w-5 h-5"></i>
+                       </div>
+                       <div>
+                           <div class="text-xs font-bold text-gray-400 uppercase">Farming Method</div>
+                           <div class="text-base font-extrabold text-gray-800" id="profile-farming-page">--</div>
+                       </div>
+                   </div>
+               </div>
+
+               <!-- Active Yield Management Card -->
+               <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-8 space-y-4">
+                   <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 space-y-2 sm:space-y-0">
+                       <h4 class="font-black text-gray-800 text-lg flex items-center">
+                           <i data-lucide="sprout" class="w-5 h-5 mr-2 text-green-600"></i>
+                           <span data-i18n="current_yield_title">Current Active Crop Yield</span>
+                       </h4>
+                       <button id="btn-trigger-add-crop" class="px-3.5 py-1.5 bg-green-100 text-green-800 font-bold rounded-lg text-xs hover:bg-green-200 transition flex items-center space-x-1">
+                           <i data-lucide="plus" class="w-4 h-4"></i>
+                           <span data-i18n="add_custom_crop">+ Add Custom Crop</span>
+                       </button>
+                   </div>
+                   
+                   <div class="flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-5 rounded-xl border border-gray-100 space-y-4 md:space-y-0">
+                       <div class="flex items-center space-x-4">
+                           <div class="p-4 bg-green-100 text-green-700 rounded-2xl font-black text-2xl" id="profile-yield-icon">🌾</div>
+                           <div>
+                               <div class="text-xs font-bold uppercase text-gray-400" data-i18n="dash_crop">Primary Crop Yield</div>
+                               <div class="text-2xl font-black text-gray-900 capitalize" id="profile-crop-page">--</div>
+                           </div>
+                       </div>
+                       
+                       <div class="w-full md:w-auto">
+                           <label class="block text-xs font-bold text-gray-500 uppercase mb-1" data-i18n="crop_search_placeholder">Search / Select Crop</label>
+                           <div class="flex gap-2">
+                               <select id="profile-crop-select" class="px-4 py-2 border rounded-lg text-sm font-semibold bg-gray-50 focus:ring-2 focus:ring-green-500">
+                                   <!-- Populated dynamically -->
+                               </select>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+
+               <!-- Profile Edit Mode Form -->
+               <form id="profile-edit-mode" class="hidden space-y-4 max-w-lg mx-auto mb-8 bg-green-50/50 p-6 rounded-2xl border border-green-100">
+                   <h4 class="font-bold text-gray-800 text-lg border-b pb-2" data-i18n="edit_profile_btn">Edit Farmer Profile</h4>
+                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-1" data-i18n="name_label">Full Name</label>
+                          <input type="text" id="edit-profile-name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 bg-white text-sm">
+                       </div>
+                       <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-1">Village</label>
+                          <input type="text" id="edit-profile-village" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 bg-white text-sm">
+                       </div>
+                   </div>
+
+                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-1">District</label>
+                          <input type="text" id="edit-profile-district" placeholder="e.g. Pune" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 bg-white text-sm">
+                       </div>
+                       <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-1">State</label>
+                          <input type="text" id="edit-profile-state" placeholder="e.g. Maharashtra" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 bg-white text-sm">
+                       </div>
+                   </div>
+
+                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                       <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-1">Farm Size (Acres)</label>
+                          <input type="number" step="0.1" id="edit-profile-land" placeholder="e.g. 2.5" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 bg-white text-sm">
+                       </div>
+                       <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-1">Soil Type</label>
+                          <select id="edit-profile-soil" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 bg-white text-sm font-semibold">
+                             <option value="Black Soil">Black Soil</option>
+                             <option value="Alluvial Soil">Alluvial Soil</option>
+                             <option value="Red Soil">Red Soil</option>
+                             <option value="Laterite Soil">Laterite Soil</option>
+                             <option value="Clay Soil">Clay Soil</option>
+                             <option value="Loamy Soil">Loamy Soil</option>
+                             <option value="Arid Soil">Arid/Desert Soil</option>
+                          </select>
+                       </div>
+                       <div>
+                          <label class="block text-sm font-semibold text-gray-700 mb-1">Farming Type</label>
+                          <select id="edit-profile-farming" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 bg-white text-sm font-semibold">
+                             <option value="Organic Farming">Organic Farming</option>
+                             <option value="Conventional Farming">Conventional Farming</option>
+                             <option value="Natural Farming">Natural/Zero Budget</option>
+                             <option value="Precision Farming">Precision Farming</option>
+                          </select>
+                       </div>
+                   </div>
+
+                   <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-1" data-i18n="crop_label">Primary Crop Yield</label>
+                      <select id="edit-profile-crop" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 bg-white font-semibold text-sm">
+                         <!-- Populated dynamically -->
+                      </select>
+                   </div>
+                   
+                   <div class="flex justify-end space-x-3 pt-4">
+                      <button type="button" id="btn-cancel-edit" class="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition text-sm" data-i18n="cancel_btn">Cancel</button>
+                      <button type="submit" class="px-5 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition text-sm" data-i18n="save_btn">Save</button>
+                   </div>
                </form>
 
                <div class="flex justify-center border-t pt-6">
@@ -614,8 +734,34 @@
            </div>
       </div>
     </div>
+
+    <!-- Custom Crop Addition Modal -->
+    <div id="modal-custom-crop" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 transform scale-95 transition-all">
+        <div class="flex justify-between items-center border-b pb-3">
+          <h3 class="font-extrabold text-lg text-gray-800 flex items-center">
+            <i data-lucide="plus-circle" class="w-5 h-5 mr-2 text-green-600"></i>
+            <span data-i18n="custom_crop_modal_title">Add Custom Crop Yield</span>
+          </h3>
+          <button id="custom-crop-close" class="text-gray-400 hover:text-gray-600">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="add_crop_name_label">Crop Name</label>
+          <input type="text" id="custom-crop-input" placeholder="e.g. Dragonfruit, Cardamom, Turmeric..." data-i18n="enter_crop_name" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 font-semibold text-gray-800">
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-2">
+          <button id="custom-crop-cancel" class="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition text-sm" data-i18n="cancel_btn">Cancel</button>
+          <button id="custom-crop-save" class="px-5 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition text-sm" data-i18n="save_btn">Add to My Yield</button>
+        </div>
+      </div>
+    </div>
+    </div>
   </main>
 
-  <script type="module" src="/src/script.js"></script>
+  <script type="module" src="/src/frontend/app.ts"></script>
 </body>
 </html>
