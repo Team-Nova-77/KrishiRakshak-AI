@@ -20,7 +20,7 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-async function startServer() {
+export async function createApp() {
     const app = express();
 
     // Security HTTP Headers
@@ -65,8 +65,6 @@ async function startServer() {
 
     // Crop Diagnostic Routes
     app.post('/api/analyze', aiAnalysisLimiter, requireAuth, upload.single('image'), analyze);
-
-
     app.get('/api/history', requireAuth, getHistory);
     app.delete('/api/history/:id', requireAuth, deleteHistoryRecord);
 
@@ -82,6 +80,12 @@ async function startServer() {
         console.error('[KrishiRakshak AI Server Error]', err);
         res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
     });
+
+    return app;
+}
+
+async function startServer() {
+    const app = await createApp();
 
     // Production build vs Dev Vite middleware
     const distPath = path.join(process.cwd(), 'dist');
@@ -105,4 +109,7 @@ async function startServer() {
     });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+    startServer();
+}
+

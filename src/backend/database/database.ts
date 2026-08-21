@@ -4,7 +4,11 @@ import path from 'path';
 let dbInstance: any;
 
 export async function initDb() {
-  const dbPath = path.resolve(process.cwd(), 'database.sqlite');
+  if (dbInstance) return getDb();
+
+  const dbPath = process.env.VERCEL
+    ? path.join('/tmp', 'database.sqlite')
+    : path.resolve(process.cwd(), 'database.sqlite');
   dbInstance = new Database(dbPath);
 
   dbInstance.exec(`

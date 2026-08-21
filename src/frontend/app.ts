@@ -82,7 +82,7 @@ async function initState() {
     try {
         const res = await fetch('/api/me', { credentials: 'include' });
         if (res.ok) {
-            const json = await res.json();
+            const json = await parseJsonResponse(res);
             if (json.success && json.farmer) {
                 state.user = json.farmer;
                 state.view = 'dashboard';
@@ -777,6 +777,16 @@ function displayReport(data: any) {
             alertsCard.classList.add('hidden');
         }
     }
+}
+
+async function parseJsonResponse(res: Response): Promise<any> {
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error(`[API Non-JSON Response ${res.status}]`, text.substring(0, 200));
+        throw new Error(`Server returned non-JSON response (${res.status}). Please check API backend routing.`);
+    }
+    return res.json();
 }
 
 async function authenticatedFetch(url: string, options: RequestInit = {}): Promise<Response> {
