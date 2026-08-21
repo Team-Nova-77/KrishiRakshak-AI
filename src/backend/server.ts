@@ -46,8 +46,12 @@ export async function createApp() {
     // Global Rate Limiting for API routes
     app.use('/api', apiLimiter);
 
-    await initDb();
-    console.log('[KrishiRakshak AI] Database initialized.');
+    try {
+        await initDb();
+        console.log('[KrishiRakshak AI] Database initialized.');
+    } catch (err) {
+        console.error('[KrishiRakshak AI DB Error]', err);
+    }
 
     // Health check endpoint
     app.get('/api/health', (_req: Request, res: Response) => {

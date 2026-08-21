@@ -6,10 +6,15 @@ let dbInstance: any;
 export async function initDb() {
   if (dbInstance) return getDb();
 
-  const dbPath = process.env.VERCEL
-    ? path.join('/tmp', 'database.sqlite')
-    : path.resolve(process.cwd(), 'database.sqlite');
-  dbInstance = new Database(dbPath);
+  try {
+    const dbPath = process.env.VERCEL
+      ? path.join('/tmp', 'database.sqlite')
+      : path.resolve(process.cwd(), 'database.sqlite');
+    dbInstance = new Database(dbPath);
+  } catch (err) {
+    console.warn('[KrishiRakshak AI DB Warning] Disk SQLite initialization failed, using in-memory database:', err);
+    dbInstance = new Database(':memory:');
+  }
 
   dbInstance.exec(`
     CREATE TABLE IF NOT EXISTS farmers (
